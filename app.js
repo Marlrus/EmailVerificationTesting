@@ -2,7 +2,11 @@ const   express         = require('express'),
         app             = express(),
         bodyParser      = require('body-parser'),
         mongoose        = require('mongoose'),
-        dotenv          = require('dotenv')
+        dotenv          = require('dotenv'),
+        passport        = require('passport'),
+        passportLocal   = require('passport-local'),
+        cookieSession   = require('cookie-session'),
+        localSetup      = require('./config/local-p-setup')
 
 //DOTENV
 dotenv.config()
@@ -12,6 +16,16 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 //REQUIRED ROUTES
 const loginRoutes   = require('./routes')
+
+//COOKIE SESSION CONFIG
+app.use(cookieSession({
+    maxAge: 24*60*60*1000,
+    keys: [process.env.COOKIE_KEY]
+}))
+
+//PASSPORT INITIALIZE
+app.use(passport.initialize())
+app.use(passport.session())
 
 //ROUTE SETUP
 app.use('/', loginRoutes)
