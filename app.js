@@ -7,6 +7,10 @@ const   express         = require('express'),
 dotenv.config()
 
 //REQUIRED ROUTES
+const loginRoutes   = require('./routes')
+
+//ROUTE SETUP
+app.use('/', loginRoutes)
 
 //VIEW ENGINE
 app.set('view engine', 'ejs')
