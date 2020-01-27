@@ -57,8 +57,15 @@
             <li class="list-group-item">
                 <h2 class="subtitle">Creating Your Models</h2>
                 <p class="paragraph">
+                    <strong>Tracking Verification</strong>
+                    <br>
                     To support email verification there must be some things in your user model. To distinguis verified and unverified users we need to add a <code>is_verified</code> flag to the User model with the default value ser to false. 
-                </p>    
+                </p> 
+                <p class="paragraph">
+                    <strong>Create Token Verification Model</strong>
+                    <br>
+                    When a user signs up, we need to create a verification token within Mongo. We need a new modle to handle our verification tokens. You will need to provide the userID of the user for the token that is used. There is a powerful feature in Mongo called <em>'expires'</em> that sets a document's time to live, known as TTL. It is set to 43200 seconds, meaning the verification token document will automatically delete itself after 12 hours. This means the user has 12 hours to activate their accounts before their verification tokens expire. If a user doesn't confirm their accounts in time, they can requiest a new verification token. 
+                </p>   
             </li>
         </ul>
     </div>

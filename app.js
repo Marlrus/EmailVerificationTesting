@@ -16,6 +16,12 @@ app.use('/', loginRoutes)
 app.set('view engine', 'ejs')
 
 //LOCALS
+app.use(async (req,res,next)=>{
+    // res.locals.currentUser = req.user
+    // res.locals.error = req.flash('error')
+    // res.locals.success = req.flash('success')
+    next()
+})
 
 //DB CONNECTION
 mongoose.connect(process.env.DB_URI, {
@@ -29,7 +35,6 @@ mongoose.connect(process.env.DB_URI, {
 })
 
 //SERVER
-
 const port = process.env.PORT || 3000
 
 app.listen(port, ()=> console.log(`Email Verification Test server started in: ${port}`))
