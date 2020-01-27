@@ -1,10 +1,14 @@
 const   express         = require('express'),
         app             = express(),
+        bodyParser      = require('body-parser'),
         mongoose        = require('mongoose'),
         dotenv          = require('dotenv')
 
 //DOTENV
 dotenv.config()
+
+//BODY PARSER CONFIG
+app.use(bodyParser.urlencoded({extended:true}))
 
 //REQUIRED ROUTES
 const loginRoutes   = require('./routes')

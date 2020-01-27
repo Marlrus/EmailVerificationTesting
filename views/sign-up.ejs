@@ -1,0 +1,73 @@
+<%- include("./partials/header") -%>
+
+<script type="text/javascript">
+    function checkPass() {
+        //Store the password field objects into variables ...
+        let password = document.getElementById('contraseña');
+        let confirm = document.getElementById('verificacion');
+        //Store the Confirmation Message Object ...
+        let message = document.getElementById('mensaje-verificacion');
+        let lengthMessage = document.getElementById('mensaje-longitud');
+        let submitButton = document.getElementById('submit-button')
+        //Set the colors we will be using ...
+        let good_color = "#66cc66";
+        let bad_color = "#ff6666";
+        //Compare the values in the password field 
+        //and the confirmation field
+        if (password.value.length <8){
+            lengthMessage.innerHTML = 'Minimo 8 caracteres'
+            lengthMessage.style.color = bad_color;
+            message.innerHTML = null
+        }else if (password.value == confirm.value) {
+            lengthMessage.innerHTML = null
+            //The passwords match. 
+            //Set the color to the good color and inform
+            //the user that they have entered the correct password 
+            confirm.style.backgroundColor = good_color;
+            message.style.color = good_color;
+            message.innerHTML = 'Contraseñas coinciden';
+            submitButton.disabled = false
+        } else {
+            lengthMessage.innerHTML = null
+            //The passwords do not match.
+            //Set the color to the bad color and
+            //notify the user.
+            confirm.style.backgroundColor = '#fff';
+            message.style.color = bad_color;
+            message.innerHTML = 'Contraseñas no coinciden';
+            submitButton.disabled = true
+        }
+    }  
+</script>
+
+<div class="container py-3 form-container text-white">
+    <form action="/sign-up" method="POST">
+        <div class="row">
+            <div class="form-group col-lg-6">
+                <label for="first-name">First Name</label>
+                <input name="user[first_name]" type="text" class="form-control" placeholder="First Name" required>
+            </div>
+            <div class="col-lg-6">
+                <label for="last-name">Last Name</label>
+                <input name="user[last_name]" type="text" class="form-control" placeholder="last Name" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Email address</label>
+            <input name="user[email]" type="email" class="form-control" id="exampleInputEmail1" placeholder="email" required>
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-6">
+                <label for="contraseña">Password &emsp;<span id="mensaje-longitud" class="mensaje-longitud"></span></label>
+                <input name="user[password]" type="password" class="form-control" placeholder="Password" minlength="8" id="contraseña" onkeyup="checkPass()" required>
+            </div>
+            <div class="col-lg-6">
+                <label for="verificacion">Confirm Password &emsp;<span id="mensaje-verificacion" class="mensaje-verificacion"></span></label> 
+                <input type="password" class="form-control" placeholder="Same Password" minlength="8" id="verificacion" onkeyup="checkPass()" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
+    </form>
+</div>
+
+<%- include("./partials/footer") -%>
