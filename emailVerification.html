@@ -67,6 +67,12 @@
                     When a user signs up, we need to create a verification token within Mongo. We need a new modle to handle our verification tokens. You will need to provide the userID of the user for the token that is used. There is a powerful feature in Mongo called <em>'expires'</em> that sets a document's time to live, known as TTL. It is set to 43200 seconds, meaning the verification token document will automatically delete itself after 12 hours. This means the user has 12 hours to activate their accounts before their verification tokens expire. If a user doesn't confirm their accounts in time, they can requiest a new verification token. 
                 </p>   
             </li>
+            <li class="list-group-item">
+                <h2 class="subtitle">Passport-Local and Passport-local-mongoose</h2>
+                <p class="paragraph">
+                    This tutorial assumes you have things set-up. I set up things using passport-local and passport-local-mongoose to handle the salt, hash, and password creation and validation. There is a very fixed way passport-local-mongoose works and I changed its behavior using 2 lines of code. In the local-p-setup.js configuration file <code>passport.use(User.createStrategy())</code> overrides the standard static auth method. It allows you to specify an alternative usernameField (passport-local-mongoose requires a field called username in your form to function), in our case 'email' instead of username. To enable this we go into the user.js file and use <code>UserSchema.plugin(passportLocalMongoose, { usernameField: 'email'})</code> and in our route we use <code>User.register(new User({email: req.body.email}), req.body.password, (err,user)=>{}</code> allowing us to use the <code>register()</code> method with email instead of username. 
+                </p>
+            </li>
         </ul>
     </div>
 

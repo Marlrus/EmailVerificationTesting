@@ -12,27 +12,25 @@ router.get('/sign-up', (req,res)=>{
     res.render('sign-up')
 })
 
-// router.post('/sign-up',(req,res)=>{
-//     // console.log(req.body.user)
-//     let newUser = new User({
-//         username: req.body.user.first_name,
-//         first_name: req.body.user.first_name,
-//         last_name: req.body.user.last_name,
-//         email: req.body.user.email
-//     })
-//     User.register(newUser,req.body.user.password,(err,user)=>{
-//         if(err){
-//             console.log('Getting to Error ' +err)
-//             res.send('ERROR')
-//         }
-//         passport.authenticate('local')(req,res,()=>{
-//             console.log('getting here')
-//             // console.log(req.user)
-//             res.redirect('/')
-//         })
-//     })
-// })
+//SIGN UP ROUTE REDO 3
+router.post('/sign-up',async(req,res)=>{
+    const newUser = await new User({
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
+        email: req.body.email
+    })
+    User.register(newUser, req.body.password, (err,user)=>{
+        console.log(`Created new User: ${user}`)
+        if (err){
+            return res.send(`Error: ${err}`)
+        }
+        passport.authenticate('local')(req,res,()=>{
+            res.redirect('/')
+        })
+    })
+})
 
+//LOGIN
 router.get('/login', (req,res)=>{
     res.send('FUTURE LOGIN')
 })
