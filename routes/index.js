@@ -2,7 +2,7 @@ const   express     = require('express'),
         router      = express.Router({mergeParams:true}),
         passport    = require('passport'),
         User        = require('../models/user'),
-        Token        = require('../models/token'),
+        Token       = require('../models/token'),
         middleware  = require('../middleware'),
         crypto      = require('crypto'),
         nodemailer  = require('nodemailer')
@@ -179,16 +179,29 @@ router.get('/login', (req,res)=>{
 //     }
 // )
 
-//Login Post for Verification
-router.post('/login', passport.authenticate('local'), async (req,res)=>{
-    console.log('Inside the Login route')
-    const foundUser = await User.findOne({email: req.body.email})
-    console.log(foundUser)
-    if(!foundUser.isVerified){
-        res.send('User Email is not Verified')
-    }else{
-        res.send({token: generateToken(user), user: user.toJSON()})
-    }
+// //Login Post for Verification
+// router.post('/login', passport.authenticate('local'), async (req,res)=>{
+//     console.log('Inside the Login route')
+//     const foundUser = await User.findOne({email: req.body.email})
+//     console.log(foundUser)
+//     if(!foundUser.isVerified){
+//         res.send('User Email is not Verified')
+//     }else{
+//         res.redirect('/profile')
+//     }
+// })
+
+//LOGIN 
+router.post('/login', (req,res)=>{
+    console.log('In the login post route')
+    passport.authenticate('local')(req,res,()=>{
+        console.log('Inside passport.authenticate')
+        if(req.user.isVerified){
+            res.redirect('/profile')
+        }else{
+            res.redirect('/verification')
+        }
+    })
 })
 
 //LOGOUT
