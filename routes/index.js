@@ -53,20 +53,38 @@ router.post('/sign-up',(req,res)=>{
             from: 'no-reply@emailVerificationTest.com', 
             to: user.email,
             subject: 'Account Verification Token',
-            text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n'
+            text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '\n'
         }
         transporter.sendMail(mailOptions, (err)=>{
             console.log('INSIDE SENDMAIL')
-            res.send('A verification email was sent to: ' + user.email)
         })
         passport.authenticate('local')(req,res,()=>{
             if(user.isVerified){
                 res.redirect('/profile')
             }else{
-                res.send('Please verify your email')
+                res.send(`A verification email was sent to ${user.email}, please verify to continue.`)
             }
         })
     })
+})
+
+//CONFIRMATION LINK
+router.get('/confirmation/:token',async (req,res)=>{
+    console.log(req.params.token)
+    const foundToken = await Token.findOne({token: req.params.token})
+    // console.log(foundToken)
+    if(!foundToken){
+        console.log('Token not found')
+        res.redirect('/')
+    } else{
+        const confirmedUser = await User.findById(req.user._id)
+        // console.log(confirmedUser)
+        confirmedUser.isVerified = true
+        await confirmedUser.save()
+        // console.log(confirmedUser.isVerified)
+        // console.log(req.user)
+        res.redirect('/profile')  
+    }
 })
 
 //LOGIN

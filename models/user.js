@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
     last_name: String,
     email: String,
     username: String,
-    isVerfied: {type: Boolean, default: false},
+    isVerified: {type: Boolean, default: false},
     password: String,
     password_reset_token: String,
     password_reset_expires: Date
