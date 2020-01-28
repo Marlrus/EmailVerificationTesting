@@ -1,0 +1,14 @@
+<%- include("./partials/header") -%>
+
+<div class="container">
+    <h1 class="display-4"><%=user.first_name%>'s Profile</h1>
+    <p>
+        <strong>Additional Info</strong>
+        <br>
+        <strong>Email:</strong> <%=user.email%>
+        <br>
+        <strong>Verified:</strong> <%if(user.isVerified){%>Yes<%}else{%>No<%}%>
+    </p>
+</div>
+
+<%- include("./partials/footer") -%>

@@ -27,19 +27,19 @@ app.use(cookieSession({
 app.use(passport.initialize())
 app.use(passport.session())
 
+//LOCALS
+app.use(async (req,res,next)=>{
+    res.locals.user = req.user
+    // res.locals.error = req.flash('error')
+    // res.locals.success = req.flash('success')
+    next()
+})
+
 //ROUTE SETUP
 app.use('/', loginRoutes)
 
 //VIEW ENGINE
 app.set('view engine', 'ejs')
-
-//LOCALS
-app.use(async (req,res,next)=>{
-    // res.locals.currentUser = req.user
-    // res.locals.error = req.flash('error')
-    // res.locals.success = req.flash('success')
-    next()
-})
 
 //DB CONNECTION
 mongoose.connect(process.env.DB_URI, {

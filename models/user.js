@@ -5,6 +5,7 @@ const UserSchema = new mongoose.Schema({
     first_name: String,
     last_name: String,
     email: String,
+    username: String,
     isVerfied: {type: Boolean, default: false},
     password: String,
     password_reset_token: String,
@@ -12,6 +13,6 @@ const UserSchema = new mongoose.Schema({
 })
 
 //Passport Local Mongoose methods
-UserSchema.plugin(passportLocalMongoose, { usernameField: 'email'})
+UserSchema.plugin(passportLocalMongoose, { usernameField: 'email' })
 
 module.exports = mongoose.model('User', UserSchema)
