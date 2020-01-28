@@ -1,0 +1,19 @@
+<%- include("./partials/header") -%>
+
+<div class="container">
+    <h1 class="display-4">Email Verification</h1>
+    <p>
+        Your account is pending verification. An email was sent to <%=user.email%>, please follow the link to verify your account. <em>*Token is valid for 24 hours</em>
+    </p>
+    <form action="/verification" method="POST">
+        <h3>If the email above is wrong or your token expired, please specify your email</h3>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Email</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="<%=user.email%>" name="email">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<%- include("./partials/footer") -%>
