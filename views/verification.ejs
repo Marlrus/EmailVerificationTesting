@@ -6,10 +6,15 @@
         Your account is pending verification. An email was sent to <%=user.email%>, please follow the link to verify your account. <em>*Token is valid for 24 hours</em>
     </p>
     <form action="/verification" method="POST">
-        <h3>If the email above is wrong or your token expired, please specify your email</h3>
+        <h3>If your Token has expired, click here to resend to <%=user.email%></h3>
+        <input name="email" type="email" value="<%=user.email%>" hidden>
+        <button type="submit" class="btn btn-primary">New Token</button>
+    </form>
+    <form action="/verification" method="POST">
+        <h3>If the email above is wrong, please specify your email</h3>
         <div class="form-group">
             <label for="exampleInputEmail1">Email</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="<%=user.email%>" name="email">
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="New email address" name="email">
             <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
