@@ -80,107 +80,40 @@ router.post('/verification',async(req,res)=>{
         console.log('Token Exists & Emails Match')
         req.flash('success', `Email verification token is still valid check your inbox or spam folder at ${user.email}`)
         res.redirect('/verification')
-        //new email
     }else if (token && !sameEmail){
+        //new email
         console.log('Token Exists but Emails Not matching')
         console.log(`Old email: ${user.email}`)
-        user.email = req.body.email
-        user.username = req.body.username
-        user.save()
-        console.log(`Updated user: ${user}`)
-        req.flash('success',`Email changed and token snet to ${req.body.email}. Must login again`)
-        res.redirect('/login')
+        const updatedUser = await middleware.updateUser(user,req,res)
+        if(updatedUser){
+            console.log(`Updated user: ${updatedUser}`)
+            middleware.sendVerificationEmail(updatedUser,token,req)
+            req.flash('success',`Email changed and token sent to ${updatedUser.email}. Must login again`)
+            res.redirect('/login')
+        }
     //handle expired token
     }else if (!token && sameEmail){
         //same email
         console.log(`Token expired, Emails Match`)
+        const newToken =await middleware.createToken(user)
+        middleware.sendVerificationEmail(user,newToken,req)
         req.flash('success',`Token had expired, re-sent to ${user.email}`)
         res.redirect('/verification')
     }else{
         //new email
         console.log(`Token expired, Emails don't match`)
         console.log(`Old email: ${user.email}`)
-        //UPDATE EMAIL CHECK EXISTING EMAIL UPDATE IF NOT EXISTING
-        user.email = req.body.email
-        user.username = req.body.email
-        user.save()
-        console.log(`Updated user: ${user}`)
-        req.flash('success',`Email changed and token snet to ${req.body.email}. Must login again`)
-        res.redirect('/login')
+        const updatedUser = await middleware.updateUser(user,req,res)
+        if(updatedUser){
+            console.log(`Updated user: ${updatedUser}`)
+            const newToken =await middleware.createToken(updatedUser)
+            middleware.sendVerificationEmail(updatedUser,newToken,req)
+            req.flash('success',`Email changed and token sent to ${updatedUser.email}. Must login again`)
+            res.redirect('/login')
+        }
     }
     
 })
-// //verification RESEND OLD
-// router.post('/verification',async(req,res)=>{
-//     //find user in DB
-//     const foundUser = await User.findById(req.user._id)
-//     console.log(foundUser)
-//     console.log('Checking Emails')
-//     //Handle if email is the same
-//     if(foundUser.email === req.body.email){
-//         console.log('Same Email')
-//         //CAN BE MADE INTO MIDDLEWARE
-//         //Create & save verification token for this user
-//         let token = await Token.create({
-//             _userID: foundUser._id,
-//             token: crypto.randomBytes(16).toString('hex')
-//         })
-//         console.log('CREATED TOKEN:')
-//         console.log(token)
-//         //Send the Email CREATED SENDGRID
-//         let transporter = nodemailer.createTransport({
-//             service: 'Sendgrid',
-//             auth: {
-//                 user: process.env.SENDGRID_USERNAME,
-//                 pass: process.env.SENDGRID_PASSWORD
-//             }
-//         })
-//         let mailOptions = { 
-//             from: 'no-reply@emailVerificationTest.com', 
-//             to: foundUser.email,
-//             subject: 'Email Test Account Verification Token',
-//             text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n'
-//         }
-//         transporter.sendMail(mailOptions, (err)=>{
-//             console.log('SENDING NEW TOKEN')
-//         })
-//         //Return to verification Message
-//         res.render('verification')
-//     }else{
-//         //change email and save
-//         foundUser.email = req.body.email
-//         foundUser.username = req.body.email
-//         await foundUser.save()
-//         console.log('Different Email Handler: UPDATING')
-//         console.log(foundUser)
-//         //Handle if email is different
-//         let token = await Token.create({
-//             _userID: foundUser._id,
-//             token: crypto.randomBytes(16).toString('hex')
-//         })
-//         console.log('CREATED TOKEN:')
-//         console.log(token)
-//         //Send the Email CREATED SENDGRID
-//         let transporter = nodemailer.createTransport({
-//             service: 'Sendgrid',
-//             auth: {
-//                 user: process.env.SENDGRID_USERNAME,
-//                 pass: process.env.SENDGRID_PASSWORD
-//             }
-//         })
-//         let mailOptions = { 
-//             from: 'no-reply@emailVerificationTest.com', 
-//             to: foundUser.email,
-//             subject: 'Account Verification Token',
-//             text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n'
-//         }
-//         transporter.sendMail(mailOptions, (err)=>{
-//             console.log('SENDING NEW TOKEN')
-//         })
-//         //Return to verification Message
-//         res.render('verification')
-//     }
-// })
 
 //verification LINK
 router.get('/verification/:token',async (req,res)=>{
@@ -196,7 +129,7 @@ router.get('/verification/:token',async (req,res)=>{
         // console.log(confirmedUser.isVerified)
         console.log(req.user)
         req.flash('success', 'Email successfuly verified!')
-        res.redirect('/login')  
+        res.redirect('/profile')  
     } else{
         console.log('Token not found')
         req.flash('error','Token Expired!')
@@ -216,7 +149,7 @@ router.post('/verification/tokenforminput',async(req,res)=>{
         await confirmedUser.save()
         console.log(req.user)
         req.flash('success', 'Email successfuly verified!')
-        res.redirect('/login')  
+        res.redirect('/profile')  
     }else{
         req.flash('error',`Invalid token value sent through the form. Please verify with the value sent to the email: ${req.user.email}`)
         res.redirect('/verification')
@@ -241,6 +174,7 @@ router.post('/login', passport.authenticate('local',
         // console.log(req.user)
         if(req.user.isVerified){
             console.log(`${req.user.first_name} is Verified`)
+            req.flash('success',`Welcome Back ${req.user.first_name}`)
             res.redirect('/profile')
         }else{
             req.flash('error',`Please verify your email with the link sent to ${req.user.email}`)

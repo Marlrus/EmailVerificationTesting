@@ -48,27 +48,53 @@ middlewareObj.sendVerificationEmail = async(user,token,req)=>{
     console.log('IN THE EMAIL METHOD')
     console.log('==================')
     //USER AND TOKEN GETTING HERE VERIFIED
-    const transporter = nodemailer.createTransport({
-        service: 'Sendgrid',
-        auth: {
-            user: process.env.SENDGRID_USERNAME,
-            pass: process.env.SENDGRID_PASSWORD
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'Sendgrid',
+            auth: {
+                user: process.env.SENDGRID_USERNAME,
+                pass: process.env.SENDGRID_PASSWORD
+            }
+        })
+        console.log('Creating Mail Options')
+        let mailOptions = { 
+            from: 'no-reply@emailVerificationTest.com', 
+            to: user.email,
+            subject: 'Email Test Account Verification Token',
+            text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n\n' + 'Or copy the token: ' + token.token
         }
-    })
-    console.log('Creating Mail Options')
-    let mailOptions = { 
-        from: 'no-reply@emailVerificationTest.com', 
-        to: user.email,
-        subject: 'Email Test Account Verification Token',
-        text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n\n' + 'Or copy the token: ' + token.token
+        console.log(mailOptions)
+        //Sending Mail
+        console.log(`Sending Mail! (Currently Disabled)`)
+        // await transporter.sendMail(mailOptions, (err)=>{
+        //     console.log('SENDING TOKEN')
+        // })
+        return
+    } catch (err) {
+        console.log(`ERROR FOUND: ${err}`)
+        return
     }
-    console.log(mailOptions)
-    //Sending Mail
-    console.log(`Sending Mail! (Currently Disabled)`)
-    // await transporter.sendMail(mailOptions, (err)=>{
-    //     console.log('SENDING TOKEN')
-    // })
-    return
+}
+
+//Update User related
+middlewareObj.updateUser = async (user,req,res)=>{
+    console.log('==================')
+    console.log('IN THE UPDATEUSER METHOD')
+    console.log('==================')
+    //Check if the email is taken
+    const checkEmail = await User.findOne({email:req.body.email})
+    if(checkEmail){
+        console.log('Error: User with that email already exists')
+        req.flash('error','A user with that email already exists')
+        res.redirect('/verification')
+        return false
+    }else{
+        user.email = req.body.email
+        user.username = req.body.email
+        user.save()
+        return user
+    }
+
 }
 
 module.exports = middlewareObj
