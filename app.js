@@ -3,6 +3,7 @@ const   express         = require('express'),
         bodyParser      = require('body-parser'),
         mongoose        = require('mongoose'),
         dotenv          = require('dotenv'),
+        flash           = require('connect-flash'),
         passport        = require('passport'),
         passportLocal   = require('passport-local'),
         cookieSession   = require('cookie-session'),
@@ -13,6 +14,9 @@ dotenv.config()
 
 //BODY PARSER CONFIG
 app.use(bodyParser.urlencoded({extended:true}))
+
+//CONNECT FLASH
+app.use(flash())
 
 //REQUIRED ROUTES
 const loginRoutes   = require('./routes')
@@ -30,8 +34,8 @@ app.use(passport.session())
 //LOCALS
 app.use(async (req,res,next)=>{
     res.locals.user = req.user
-    // res.locals.error = req.flash('error')
-    // res.locals.success = req.flash('success')
+    res.locals.error = req.flash('error')
+    res.locals.success = req.flash('success')
     next()
 })
 

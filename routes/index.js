@@ -32,7 +32,8 @@ router.post('/sign-up',(req,res)=>{
     User.register(newUser, req.body.password, async(err,user)=>{
         console.log(`Created new User: ${user}`)
         if (err){
-            return res.send(`Error: ${err}`)
+            req.flash('error', `${err.message}`)
+            return res.redirect('/sign-up')
         }
         //Create & save verification token for this user
         let token = await Token.create({
@@ -101,7 +102,7 @@ router.post('/verification',async(req,res)=>{
         let mailOptions = { 
             from: 'no-reply@emailVerificationTest.com', 
             to: foundUser.email,
-            subject: 'Account Verification Token',
+            subject: 'Email Test Account Verification Token',
             text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n'
         }
         transporter.sendMail(mailOptions, (err)=>{
@@ -161,7 +162,8 @@ router.get('/verification/:token',async (req,res)=>{
         await confirmedUser.save()
         // console.log(confirmedUser.isVerified)
         console.log(req.user)
-        res.redirect('/profile')  
+        req.flash('success', 'Email successfuly verified!')
+        res.redirect('/login')  
     }
 })
 
@@ -170,39 +172,26 @@ router.get('/login', (req,res)=>{
     res.render('login')
 })
 
-// router.post('/login', passport.authenticate('local',
-//     {
-//         successRedirect: '/profile',
-//         failureRedirect: '/login',
-//     }),(req,res)=>{
-
-//     }
-// )
-
-// //Login Post for Verification
-// router.post('/login', passport.authenticate('local'), async (req,res)=>{
-//     console.log('Inside the Login route')
-//     const foundUser = await User.findOne({email: req.body.email})
-//     console.log(foundUser)
-//     if(!foundUser.isVerified){
-//         res.send('User Email is not Verified')
-//     }else{
-//         res.redirect('/profile')
-//     }
-// })
-
-//LOGIN 
-router.post('/login', (req,res)=>{
-    console.log('In the login post route')
-    passport.authenticate('local')(req,res,()=>{
-        console.log('Inside passport.authenticate')
+//CORRECT LOGIN HANDLER
+router.post('/login', passport.authenticate('local',
+    {
+        // successRedirect: '/profile',
+        failureRedirect: '/login',
+        failureFlash: true,
+    }),(req,res)=>{
+        console.log('==================')
+        console.log('IN THE LOGIN ROUTE')
+        console.log('==================')
+        // console.log(req.user)
         if(req.user.isVerified){
+            console.log(`${req.user.first_name} is Verified`)
             res.redirect('/profile')
         }else{
-            res.redirect('/verification')
+            req.flash('error',`Please verify your email with the link sent to ${req.user.email}`)
+            res.redirect('/login')
         }
-    })
-})
+    }
+)
 
 //LOGOUT
 router.get('/logout', middleware.isLoggedIn, (req,res)=>{
@@ -212,7 +201,7 @@ router.get('/logout', middleware.isLoggedIn, (req,res)=>{
 
 //Profile Route
 router.get('/profile', middleware.isLoggedIn, (req,res)=>{
-    // res.send(`${req.user} is logged in`)
+    req.flash('success', `Welcome back ${req.user.first_name}!`)
     res.render('profile')
 })
 

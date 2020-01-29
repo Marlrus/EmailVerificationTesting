@@ -6,7 +6,8 @@ middlewareObj.isLoggedIn = (req,res,next)=>{
         return next()
     }
     console.log('Middleware: User not authenticated')
-    res.redirect('/login')
+    req.flash('error',`Please verify your email with the link sent to ${req.user.email}`)
+    res.redirect('/verification')
 }
 
 module.exports = middlewareObj
