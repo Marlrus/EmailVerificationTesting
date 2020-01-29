@@ -188,12 +188,8 @@ router.get('/verification/:token',async (req,res)=>{
     console.log(req.params.token)
     const foundToken = await Token.findOne({token: req.params.token})
     console.log(foundToken)
-    if(!foundToken){
-        console.log('Token not found')
-        req.flash('error','Token Expired!')
-        res.redirect('/verification')
-    } else{
-        const confirmedUser = await User.findById(foundToken._userID)
+    const confirmedUser = await User.findById(foundToken._userID)
+    if(foundToken && confirmedUser){
         console.log(confirmedUser)
         confirmedUser.isVerified = true
         await confirmedUser.save()
@@ -201,6 +197,29 @@ router.get('/verification/:token',async (req,res)=>{
         console.log(req.user)
         req.flash('success', 'Email successfuly verified!')
         res.redirect('/login')  
+    } else{
+        console.log('Token not found')
+        req.flash('error','Token Expired!')
+        res.redirect('/verification')
+    }
+})
+
+//verification FORM
+router.post('/verification/tokenforminput',async(req,res)=>{
+    console.log(req.body.token)
+    const foundToken = await Token.findOne({token: req.body.token})
+    console.log(foundToken)
+    const confirmedUser = await User.findById(foundToken._userID)
+    if (foundToken && confirmedUser){
+        console.log(confirmedUser)
+        confirmedUser.isVerified = true
+        await confirmedUser.save()
+        console.log(req.user)
+        req.flash('success', 'Email successfuly verified!')
+        res.redirect('/login')  
+    }else{
+        req.flash('error',`Invalid token value sent through the form. Please verify with the value sent to the email: ${req.user.email}`)
+        res.redirect('/verification')
     }
 })
 
