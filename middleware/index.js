@@ -65,14 +65,15 @@ middlewareObj.sendVerificationEmail = async(user,token,req)=>{
             from: 'no-reply@emailVerificationTest.com', 
             to: user.email,
             subject: 'Email Test Account Verification Token',
-            text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n\n' + 'Or copy the token: ' + token.token
+            text: 'Hello,' +user.first_name+'!\n\n' + 'We receieved a password reset request from our webpage.\n\nPlease verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n\n' + 'Or copy the token: ' + token.token
         }
         console.log(mailOptions)
         //Sending Mail
-        console.log(`Sending Mail! (Currently Disabled)`)
-        // await transporter.sendMail(mailOptions, (err)=>{
-        //     console.log('SENDING TOKEN')
-        // })
+        // console.log(`Sending Mail! (Currently Disabled)`)
+        console.log('Sending Mail!')
+        await transporter.sendMail(mailOptions, (err)=>{
+            console.log('SENDING TOKEN')
+        })
         return
     } catch (err) {
         console.log(`ERROR FOUND: ${err}`)
@@ -99,14 +100,15 @@ middlewareObj.sendPasswordToken = async(user,token,req)=>{
             from: 'no-reply@emailVerificationTest.com', 
             to: user.email,
             subject: 'Password Reset Link and Token',
-            text: 'Hello,\n\n' + 'Please reset your password by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n\n' + 'Or copy the token: ' + token.token
+            text: 'Hello,' +user.first_name+'!\n\n' + 'We receieved a password reset request from our webpage.\n\n Please reset your password by clicking the link: \nhttp:\/\/' + req.headers.host + '\/password-forgot\/' + token.token + '\n\n' + 'Or copy the token: ' + token.token
         }
         console.log(mailOptions)
         //Sending Mail
-        console.log(`Sending Mail! (Currently Disabled)`)
-        // await transporter.sendMail(mailOptions, (err)=>{
-        //     console.log('SENDING TOKEN')
-        // })
+        // console.log(`Sending Mail! (Currently Disabled)`)
+        console.log('Sending Mail!')
+        await transporter.sendMail(mailOptions, (err)=>{
+            console.log('SENDING TOKEN')
+        })
         return
     } catch (err) {
         console.log(`ERROR FOUND: ${err}`)

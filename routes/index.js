@@ -261,9 +261,11 @@ router.post('/password-forgot',async(req,res)=>{
 
 //token input form
 router.get('/token-password-reset',(req,res)=>{
-    res.render('token-password-reset')
+    let token = false
+    res.render('token-password-reset', {token,})
 })
 
+//Reset through form
 router.put('/password-forgot',async(req,res)=>{
     console.log(req.body)
     //find token through form
@@ -281,6 +283,8 @@ router.put('/password-forgot',async(req,res)=>{
                 res.redirect('/token-password-reset')
             }else{
                 user.save()
+                //remove token (IM GOING TO LEAVE IT TO PREVENT SPAM)
+                // token.delete()
                 req.flash('success', `Password successfuly changed! Log in again please`)
                 res.redirect('/login')
             }
@@ -289,6 +293,13 @@ router.put('/password-forgot',async(req,res)=>{
         req.flash('error', 'Token value invalid, please try again')
         res.redirect('/token-password-reset')
     }
+})
+
+//reset through link
+router.get('/password-forgot/:token',(req,res)=>{
+    console.log(req.params.token)
+    let token = req.params.token
+    res.render('token-password-reset',{token,})
 })
 
 //TESTING
