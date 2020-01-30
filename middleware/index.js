@@ -9,7 +9,7 @@ require('dotenv').config()
 
 middlewareObj.isLoggedIn = (req,res,next)=>{
     console.log('==================')
-    console.log('IN THE LOG CHECK MIDDLEWARE')
+    console.log('IN THE ISLOGGEDIN MIDDLEWARE')
     console.log('==================')
     if(req.isAuthenticated()){
         // console.log(req.user)

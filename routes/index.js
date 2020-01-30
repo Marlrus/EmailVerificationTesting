@@ -195,6 +195,38 @@ router.get('/profile', middleware.isLoggedIn, (req,res)=>{
     res.render('profile')
 })
 
+//==================
+//PASSWORD ROUTES
+//==================
+router.get('/profile/password-change',middleware.isLoggedIn,(req,res)=>{
+    res.render('password-change')
+})
+
+//PASSWORD ChANGE ROUTE
+router.post('/profile/password-change',middleware.isLoggedIn,async(req,res)=>{
+    let currentPassword = req.body.currentPassword
+    let newPassword = req.body.newPassword
+    if(currentPassword === newPassword){
+        req.flash('error','New password cannot be the same as current password')
+        res.redirect('/profile/password-change')
+    }else{
+        const user = await User.findById(req.user._id)
+        console.log(user)
+        user.changePassword(currentPassword, newPassword, (err, user)=>{
+            console.log('Inside changePassword')
+            if(err && err.name==='IncorrectPasswordError'){
+                req.flash('error', `Wrong password, please try again.`)
+                res.redirect('/profile/password-change')
+            }else if(err){
+                req.flash('error', 'Something went wrong, please try again!')
+            }else{
+                req.flash('success', 'Password changed Successfuly!')
+                res.redirect('/profile')
+            }
+        })
+    }
+})
+
 //TESTING
 router.get('/test',async(req,res)=>{
     console.log('==================')

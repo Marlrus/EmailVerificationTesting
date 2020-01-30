@@ -8,8 +8,6 @@ const UserSchema = new mongoose.Schema({
     username: String,
     isVerified: {type: Boolean, default: false},
     password: String,
-    password_reset_token: String,
-    password_reset_expires: Date
 })
 
 //Passport Local Mongoose methods
