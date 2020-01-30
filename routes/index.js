@@ -78,7 +78,7 @@ router.post('/verification',async(req,res)=>{
     if(token && sameEmail){
         //Same email
         console.log('Token Exists & Emails Match')
-        req.flash('success', `Email verification token is still valid check your inbox or spam folder at ${user.email}`)
+        req.flash('error', `Email verification token is still valid check your inbox or spam folder at ${user.email}`)
         res.redirect('/verification')
     }else if (token && !sameEmail){
         //new email
@@ -126,6 +126,8 @@ router.get('/verification/:token',async (req,res)=>{
         console.log(confirmedUser)
         confirmedUser.isVerified = true
         await confirmedUser.save()
+        //REMOVE TOKEN TO ENABLE OTHER TOKENS
+        token.delete()
         // console.log(confirmedUser.isVerified)
         console.log(req.user)
         req.flash('success', 'Email successfuly verified!')
