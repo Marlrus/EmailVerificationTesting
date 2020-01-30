@@ -7,7 +7,8 @@ const   express         = require('express'),
         passport        = require('passport'),
         passportLocal   = require('passport-local'),
         cookieSession   = require('cookie-session'),
-        localSetup      = require('./config/local-p-setup')
+        localSetup      = require('./config/local-p-setup'),
+        methodOverride  = require('method-override')
 
 //DOTENV
 dotenv.config()
@@ -38,6 +39,9 @@ app.use(async (req,res,next)=>{
     res.locals.success = req.flash('success')
     next()
 })
+
+//METHOD OVERRIDE
+app.use(methodOverride('_method'))
 
 //ROUTE SETUP
 app.use('/', loginRoutes)

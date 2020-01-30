@@ -203,7 +203,7 @@ router.get('/profile/password-change',middleware.isLoggedIn,(req,res)=>{
 })
 
 //PASSWORD ChANGE ROUTE
-router.post('/profile/password-change',middleware.isLoggedIn,async(req,res)=>{
+router.put('/profile/password-change',middleware.isLoggedIn,async(req,res)=>{
     let currentPassword = req.body.currentPassword
     let newPassword = req.body.newPassword
     if(currentPassword === newPassword){
@@ -225,6 +225,22 @@ router.post('/profile/password-change',middleware.isLoggedIn,async(req,res)=>{
             }
         })
     }
+})
+
+//PASSWORD FORGOT
+router.get('/password-forgot',(req,res)=>{
+    res.render('password-forgot')
+})
+
+//PASSWORD RESET TOKEN
+router.post('/password-forgot',async(req,res)=>{
+    req.flash('success', 'Sent Token')
+    res.redirect('/password-forgot')
+})
+
+router.put('/password-forgot',async(req,res)=>{
+    req.flash('success', 'Submitted Token Password Reset')
+    res.redirect('/password-forgot')
 })
 
 //TESTING
