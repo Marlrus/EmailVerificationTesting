@@ -234,13 +234,61 @@ router.get('/password-forgot',(req,res)=>{
 
 //PASSWORD RESET TOKEN
 router.post('/password-forgot',async(req,res)=>{
-    req.flash('success', 'Sent Token')
-    res.redirect('/password-forgot')
+    //find user
+    const user = await User.findOne({email:req.body.email})
+    console.log(user)
+    if(user){
+        //look for existing token
+        const existingToken = await Token.findOne({_userID: user._id})
+        if(existingToken){
+            console.log(existingToken)
+            req.flash('success',`A valid token has already been sent to ${user.email}, please check your inbox and spam.`)
+            res.redirect('/token-password-reset')
+        }else{
+            //create token
+            const token = await middleware.createToken(user)
+            console.log(token)
+            //send token
+            middleware.sendPasswordToken(user,token,req)
+            req.flash('success', `Sent token to ${user.email}`)
+            res.redirect('/token-password-reset')
+        }
+    }else{
+        req.flash('error','Email not associated with a registered user')
+        res.redirect('/password-forgot')
+    }
+})
+
+//token input form
+router.get('/token-password-reset',(req,res)=>{
+    res.render('token-password-reset')
 })
 
 router.put('/password-forgot',async(req,res)=>{
-    req.flash('success', 'Submitted Token Password Reset')
-    res.redirect('/password-forgot')
+    console.log(req.body)
+    //find token through form
+    token = await Token.findOne({token:req.body.token})
+    console.log(token)
+    if(token){
+        //find user using token
+        user = await User.findById(token._userID)
+        console.log(user)
+        //set password using form
+        user.setPassword(req.body.newPassword,(err)=>{
+            if(err){
+                console.log(err)
+                req.flash('error', 'Something went wrong, please try again')
+                res.redirect('/token-password-reset')
+            }else{
+                user.save()
+                req.flash('success', `Password successfuly changed! Log in again please`)
+                res.redirect('/login')
+            }
+        })
+    }else{
+        req.flash('error', 'Token value invalid, please try again')
+        res.redirect('/token-password-reset')
+    }
 })
 
 //TESTING

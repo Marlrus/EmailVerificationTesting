@@ -42,10 +42,14 @@ middlewareObj.createToken = async(user)=>{
     return token
 }
 
+//===============================
 //NODEMAILER SENDGRID RELATED
+//================================
+
+//VERIFY EMAIL SEND
 middlewareObj.sendVerificationEmail = async(user,token,req)=>{
     console.log('==================')
-    console.log('IN THE EMAIL METHOD')
+    console.log('IN THE SENDVERIFICATIONEMAIL METHOD')
     console.log('==================')
     //USER AND TOKEN GETTING HERE VERIFIED
     try {
@@ -62,6 +66,40 @@ middlewareObj.sendVerificationEmail = async(user,token,req)=>{
             to: user.email,
             subject: 'Email Test Account Verification Token',
             text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n\n' + 'Or copy the token: ' + token.token
+        }
+        console.log(mailOptions)
+        //Sending Mail
+        console.log(`Sending Mail! (Currently Disabled)`)
+        // await transporter.sendMail(mailOptions, (err)=>{
+        //     console.log('SENDING TOKEN')
+        // })
+        return
+    } catch (err) {
+        console.log(`ERROR FOUND: ${err}`)
+        return
+    }
+}
+
+//SEND PASSWORD TOKEN
+middlewareObj.sendPasswordToken = async(user,token,req)=>{
+    console.log('==================')
+    console.log('IN THE SENDPASSWORDTOKEN METHOD')
+    console.log('==================')
+    //USER AND TOKEN GETTING HERE VERIFIED
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'Sendgrid',
+            auth: {
+                user: process.env.SENDGRID_USERNAME,
+                pass: process.env.SENDGRID_PASSWORD
+            }
+        })
+        console.log('Creating Mail Options')
+        let mailOptions = { 
+            from: 'no-reply@emailVerificationTest.com', 
+            to: user.email,
+            subject: 'Password Reset Link and Token',
+            text: 'Hello,\n\n' + 'Please reset your password by clicking the link: \nhttp:\/\/' + req.headers.host + '\/verification\/' + token.token + '\n\n' + 'Or copy the token: ' + token.token
         }
         console.log(mailOptions)
         //Sending Mail
