@@ -5,7 +5,14 @@ This is a fully fledged local auth test done using MongoDB, mongoose, passport, 
 **Flow:**
 
 ```
- User gets created, verification email with link and token gets sent. If the specified email is wrong, the user can re-submit and a token and link will be sent to the new email. If the token is expired, a new token and link will be sent to the same email, or the new email. The user can verify through manually inputing the token into a form, or by following the link which will automatically verify the account and redirect to the profile. The profile can only be seen after authentication. To change the password from the profile you can do it through a form that requires the current password and a new password. If you forgot your password, you can reset it through an email by submitting a valid email for a user. Doing this creates a token and a link that get sent to the specified email in order to reset the password.
+ User gets created, verification email with link and token gets sent. 
+ If the specified email is wrong, the user can re-submit and a token and link will be sent to the new email. 
+ If the token is expired, a new token and link will be sent to the same email, or the new email. 
+ The user can verify through manually inputing the token into a form, or by following the link which will automatically verify the account and redirect to the profile. 
+ The profile can only be seen after authentication. 
+ To change the password from the profile you can do it through a form that requires the current password and a new password. 
+ If you forgot your password, you can reset it through an email by submitting a valid email for a user. 
+ Doing this creates a token and a link that get sent to the specified email in order to reset the password.
 ```
 
 ## Getting Started
