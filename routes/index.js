@@ -21,7 +21,12 @@ router.get('/sign-up', (req,res)=>{
     IN THE sign-up (GET) ROUTE
     ==============================
     `)
-    res.render('sign-up')
+    if(req.isAuthenticated()){
+        req.flash('error','Must be logged out before signing-up')
+        res.redirect('/')
+    }else{
+        res.render('sign-up')
+    }
 })
 
 //SIGN UP ROUTE REDO 3
@@ -199,7 +204,7 @@ router.get('/login', (req,res)=>{
     ==============================
     `)
     if(req.isAuthenticated()){
-        req.flash('error','You must log out before singing-up')
+        req.flash('error','You must log out before logging-in')
         res.redirect('/profile')
     }else{
         res.render('login')
