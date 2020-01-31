@@ -3,24 +3,34 @@ const   express     = require('express'),
         passport    = require('passport'),
         User        = require('../models/user'),
         Token       = require('../models/token'),
-        middleware  = require('../middleware'),
-        crypto      = require('crypto'),
-        nodemailer  = require('nodemailer')
-
-//DOT ENV
-require('dotenv').config()
+        middleware  = require('../middleware')
 
 //ROUTES
 router.get('/',(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE ROOT "/" (GET) ROUTE
+    ==============================
+    `)
     res.render('landing')
 })
 
 router.get('/sign-up', (req,res)=>{
+    console.log(`
+    ==============================
+    IN THE sign-up (GET) ROUTE
+    ==============================
+    `)
     res.render('sign-up')
 })
 
 //SIGN UP ROUTE REDO 3
 router.post('/sign-up',async(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE sign-up (POST) ROUTE
+    ==============================
+    `)
     console.log('In the Post Route')
     const newUser = new User({
         first_name: req.body.first_name,
@@ -51,73 +61,91 @@ router.post('/sign-up',async(req,res)=>{
     }
 })
 
-//verification Message
+//verification Form
 router.get('/verification',(req,res)=>{
-    if(req.user){
-        res.render('verification')
+    console.log(`
+    ==============================
+    IN THE verification (GET) ROUTE
+    ==============================
+    `)
+    if(!req.user){
+        req.flash('error','Yout must log in to verify email')
+        res.redirect('/login')
     }else{
-        req.flash('error','You must log in to do that')
-        res.redirect('Login')
+        if(req.user.isVerified){
+            req.flash('error','Your email has already been verified')
+            res.redirect('profile')
+        }else{
+            res.render('verification')
+        }
     }
 })
 
 //Verification Resend
-router.post('/verification',async(req,res)=>{
+router.post('/verification',middleware.isLoggedIn, async(req,res)=>{
     console.log('==================')
-    console.log('IN THE VERIFICATION POST ROUTE')
+    console.log('IN THE verification POST ROUTE')
     console.log('==================')
-    const user = await User.findById(req.user._id)
-    console.log(user)
-    //look for token using user
-    const token = await Token.findOne({_userID: user._id})
-    console.log(token)
-    console.log(req.body.email)
-    //Boolean
-    let sameEmail = (user.email===req.body.email)
-    //handle found token
-    if(token && sameEmail){
-        //Same email
-        console.log('Token Exists & Emails Match')
-        req.flash('error', `Email verification token is still valid check your inbox or spam folder at ${user.email}`)
-        res.redirect('/verification')
-    }else if (token && !sameEmail){
-        //new email
-        console.log('Token Exists but Emails Not matching')
-        console.log(`Old email: ${user.email}`)
-        const updatedUser = await middleware.updateUser(user,req,res)
-        if(updatedUser){
-            console.log(`Updated user: ${updatedUser}`)
-            middleware.sendVerificationEmail(updatedUser,token,req)
-            req.flash('success',`Email changed and token sent to ${updatedUser.email}. Must login again`)
-            res.redirect('/login')
-        }
-    //handle expired token
-    }else if (!token && sameEmail){
-        //same email
-        console.log(`Token expired, Emails Match`)
-        const newToken =await middleware.createToken(user)
-        middleware.sendVerificationEmail(user,newToken,req)
-        req.flash('success',`Token had expired, re-sent to ${user.email}`)
-        res.redirect('/verification')
+    if(req.user.isVerified){
+        req.flash('success','Email has already been verified')
+        res.redirect('/profile')
     }else{
-        //new email
-        console.log(`Token expired, Emails don't match`)
-        console.log(`Old email: ${user.email}`)
-        const updatedUser = await middleware.updateUser(user,req,res)
-        if(updatedUser){
-            console.log(`Updated user: ${updatedUser}`)
-            const newToken =await middleware.createToken(updatedUser)
-            middleware.sendVerificationEmail(updatedUser,newToken,req)
-            req.flash('success',`Email changed and token sent to ${updatedUser.email}. Must login again`)
-            res.redirect('/login')
+        const user = await User.findById(req.user._id)
+        console.log(user)
+        //look for token using user
+        const token = await Token.findOne({_userID: user._id})
+        console.log(token)
+        console.log(req.body.email)
+        //Boolean
+        let sameEmail = (user.email===req.body.email)
+        //handle found token
+        if(token && sameEmail){
+            //Same email
+            console.log('Token Exists & Emails Match')
+            req.flash('error', `Email verification token is still valid check your inbox or spam folder at ${user.email}`)
+            res.redirect('/verification')
+        }else if (token && !sameEmail){
+            //new email
+            console.log('Token Exists but Emails Not matching')
+            console.log(`Old email: ${user.email}`)
+            const updatedUser = await middleware.updateUser(user,req,res)
+            if(updatedUser){
+                console.log(`Updated user: ${updatedUser}`)
+                middleware.sendVerificationEmail(updatedUser,token,req)
+                req.flash('success',`Email changed and token sent to ${updatedUser.email}. Must login again`)
+                res.redirect('/login')
+            }
+        //handle expired token
+        }else if (!token && sameEmail){
+            //same email
+            console.log(`Token expired, Emails Match`)
+            const newToken =await middleware.createToken(user)
+            middleware.sendVerificationEmail(user,newToken,req)
+            req.flash('success',`Token had expired, re-sent to ${user.email}`)
+            res.redirect('/verification')
+        }else{
+            //new email
+            console.log(`Token expired, Emails don't match`)
+            console.log(`Old email: ${user.email}`)
+            const updatedUser = await middleware.updateUser(user,req,res)
+            if(updatedUser){
+                console.log(`Updated user: ${updatedUser}`)
+                const newToken =await middleware.createToken(updatedUser)
+                middleware.sendVerificationEmail(updatedUser,newToken,req)
+                req.flash('success',`Email changed and token sent to ${updatedUser.email}. Must login again`)
+                res.redirect('/login')
+            }
         }
     }
-    
 })
 
 //verification LINK
 router.get('/verification/:token',async (req,res)=>{
-    console.log('VERIFICATION ROUTE')
+    console.log(`
+    ==============================
+    IN THE verification/:token (GET) ROUTE
+    ==============================
+    `)
     console.log(req.params.token)
     const foundToken = await Token.findOne({token: req.params.token})
     console.log(foundToken)
@@ -127,7 +155,7 @@ router.get('/verification/:token',async (req,res)=>{
         confirmedUser.isVerified = true
         await confirmedUser.save()
         //REMOVE TOKEN TO ENABLE OTHER TOKENS
-        token.delete()
+        foundToken.delete()
         // console.log(confirmedUser.isVerified)
         console.log(req.user)
         req.flash('success', 'Email successfuly verified!')
@@ -141,6 +169,11 @@ router.get('/verification/:token',async (req,res)=>{
 
 //verification FORM
 router.post('/verification/tokenforminput',async(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE verification/tokenforminput (POST) ROUTE
+    ==============================
+    `)
     console.log(req.body.token)
     const foundToken = await Token.findOne({token: req.body.token})
     console.log(foundToken)
@@ -160,7 +193,17 @@ router.post('/verification/tokenforminput',async(req,res)=>{
 
 //LOGIN
 router.get('/login', (req,res)=>{
-    res.render('login')
+    console.log(`
+    ==============================
+    IN THE login (GET) ROUTE
+    ==============================
+    `)
+    if(req.isAuthenticated()){
+        req.flash('error','You must log out before singing-up')
+        res.redirect('/profile')
+    }else{
+        res.render('login')
+    }
 })
 
 //CORRECT LOGIN HANDLER
@@ -170,9 +213,11 @@ router.post('/login', passport.authenticate('local',
         failureRedirect: '/login',
         failureFlash: true,
     }),(req,res)=>{
-        console.log('==================')
-        console.log('IN THE LOGIN ROUTE')
-        console.log('==================')
+        console.log(`
+    ==============================
+    IN THE login (POST) ROUTE
+    ==============================
+    `)
         // console.log(req.user)
         if(req.user.isVerified){
             console.log(`${req.user.first_name} is Verified`)
@@ -186,14 +231,25 @@ router.post('/login', passport.authenticate('local',
 )
 
 //LOGOUT
-router.get('/logout', middleware.isLoggedIn, (req,res)=>{
+router.get('/logout', (req,res)=>{
+    console.log(`
+    ==============================
+    IN THE logout (GET) ROUTE
+    ==============================
+    `)
+    req.flash('success', `Logged out successfuly! See you again soon ${req.user.first_name}!`)
     req.logout()
     res.redirect('/')
 })
 
 //Profile Route
 router.get('/profile', middleware.isLoggedIn, (req,res)=>{
-    req.flash('success', `Welcome back ${req.user.first_name}!`)
+    console.log(`
+    ==============================
+    IN THE profile (GET) ROUTE
+    ==============================
+    `)
+    // req.flash('success', `Welcome back ${req.user.first_name}!`)
     res.render('profile')
 })
 
@@ -201,11 +257,21 @@ router.get('/profile', middleware.isLoggedIn, (req,res)=>{
 //PASSWORD ROUTES
 //==================
 router.get('/profile/password-change',middleware.isLoggedIn,(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE profile/password-change (GET) ROUTE
+    ==============================
+    `)
     res.render('password-change')
 })
 
 //PASSWORD ChANGE ROUTE
 router.put('/profile/password-change',middleware.isLoggedIn,async(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE profile/password-change (PUT) ROUTE
+    ==============================
+    `)
     let currentPassword = req.body.currentPassword
     let newPassword = req.body.newPassword
     if(currentPassword === newPassword){
@@ -231,11 +297,21 @@ router.put('/profile/password-change',middleware.isLoggedIn,async(req,res)=>{
 
 //PASSWORD FORGOT
 router.get('/password-forgot',(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE password-forgot (GET) ROUTE
+    ==============================
+    `)
     res.render('password-forgot')
 })
 
 //PASSWORD RESET TOKEN
 router.post('/password-forgot',async(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE password-forgot (POST) ROUTE
+    ==============================
+    `)
     //find user
     const user = await User.findOne({email:req.body.email})
     console.log(user)
@@ -263,12 +339,22 @@ router.post('/password-forgot',async(req,res)=>{
 
 //token input form
 router.get('/token-password-reset',(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE token-password-reset (GET) ROUTE
+    ==============================
+    `)
     let token = false
     res.render('token-password-reset', {token,})
 })
 
 //Reset through form
 router.put('/password-forgot',async(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE password-forgot (PUT) ROUTE
+    ==============================
+    `)
     console.log(req.body)
     //find token through form
     token = await Token.findOne({token:req.body.token})
@@ -299,22 +385,18 @@ router.put('/password-forgot',async(req,res)=>{
 
 //reset through link
 router.get('/password-forgot/:token',(req,res)=>{
+    console.log(`
+    ==============================
+    IN THE password-forgot/:token (GET) ROUTE
+    ==============================
+    `)
     console.log(req.params.token)
     let token = req.params.token
     res.render('token-password-reset',{token,})
 })
 
-//TESTING
-router.get('/test',async(req,res)=>{
-    console.log('==================')
-    console.log('IN THE TEST ROUTE')
-    console.log('==================')
-    const user = await User.findOne({})
-    console.log(user)
-    const token = await middleware.createToken(user)
-    console.log('AFTER CREATETOKEN METHOD')
-    console.log(token)
-    res.send('TESTING')
+router.get('/test',(req,res)=>{
+    res.render('verification')
 })
 
 module.exports = router

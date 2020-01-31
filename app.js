@@ -2,16 +2,17 @@ const   express         = require('express'),
         app             = express(),
         bodyParser      = require('body-parser'),
         mongoose        = require('mongoose'),
-        dotenv          = require('dotenv'),
         flash           = require('connect-flash'),
         passport        = require('passport'),
-        passportLocal   = require('passport-local'),
         cookieSession   = require('cookie-session'),
-        localSetup      = require('./config/local-p-setup'),
         methodOverride  = require('method-override')
 
+//UNUSED REQUIRE CONSTS
+require('passport-local')
+require('./config/local-p-setup')
+require('dotenv').config()
+
 //DOTENV
-dotenv.config()
 
 //BODY PARSER CONFIG
 app.use(bodyParser.urlencoded({extended:true}))
@@ -24,7 +25,7 @@ const loginRoutes   = require('./routes')
 
 //COOKIE SESSION CONFIG
 app.use(cookieSession({
-    maxAge: 24*60*60*1000,
+    // maxAge: 24*60*60*1000,
     keys: [process.env.COOKIE_KEY]
 }))
 

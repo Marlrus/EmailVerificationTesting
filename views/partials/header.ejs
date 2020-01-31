@@ -4,7 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
     
-        <link rel="stylesheet" href="/stylesheets/main.css">
+        <!-- <link rel="stylesheet" href="/stylesheets/main.css"> -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
             integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     
@@ -51,17 +51,22 @@
     <body>
     
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark m-0 p-0">
-            <a class="navbar-brand" href="/"> &emsp;Email Verification|| Test</a>
+            <a class="navbar-brand" href="/"> &emsp;Email Verification Test</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-item nav-link active" href="/login">Login <span class="sr-only">(current)</span></a>
-                    <a href="/sign-up" class="nav-item nav-link">Sign Up</a>
-                    <a href="/profile" class="nav-item nav-link">Profile</a>
-                    <a href="/logout" class="nav-item nav-link">Logout</a>
+                    <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+                    <%if(!user){%>
+                        <a class="nav-item nav-link" href="/login">Login <span class="sr-only">(current)</span></a>
+                        <a href="/sign-up" class="nav-item nav-link">Sign Up</a>
+                        <a href="/profile" class="nav-item nav-link">Profile</a>
+                        <%}else{%>
+                        <a href="/profile" class="nav-item nav-link">Profile</a>
+                        <a href="/logout" class="nav-item nav-link">Logout</a>
+                    <%}%>
                 </div>
             </div>
         </nav>

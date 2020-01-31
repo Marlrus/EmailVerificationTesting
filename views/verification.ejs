@@ -1,32 +1,38 @@
 <%- include("./partials/header") -%>
 
-<div class="container">
-    <h1 class="display-4">Email Verification</h1>
-    <p>
+<div class="container text-white py-3">
+    <h1 class="display-4 text-center">Email Verification</h1>
+    <h4>
         Your account is pending verification. An email was sent to <%=user.email%>, please follow the link to verify your account. <em>*Token is valid for 24 hours</em>
-    </p>
-    <form action="/verification/tokenforminput" method="POST">
-        <h3>You can also choose to copy and paste the token code from your email into this field.</h3>
-        <div class="form-group">
-            <label for="exampleInputEmail1">Token Code</label>
-            <input type="text" class="form-control" placeholder="Token Code" name="token">
-        </div>
-        <button type="submit" class="btn btn-primary">Verify Token</button>
-    </form>
-    <form action="/verification" method="POST">
-        <h3>If your Token has expired, click here to resend to <%=user.email%></h3>
-        <input name="email" type="email" value="<%=user.email%>" hidden>
-        <button type="submit" class="btn btn-primary">New Token</button>
-    </form>
-    <form action="/verification" method="POST">
-        <h3>If the email above is wrong, please specify your email</h3>
-        <div class="form-group">
-            <label for="exampleInputEmail1">Email</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="New email address" name="email">
-            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+    </h4>
+    <div class="container border border-success rounderd p-3 m-3">
+        <form action="/verification/tokenforminput" method="POST">
+            <p>You can also choose to copy and paste the token code from your email into this field.</p>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Token Code</label>
+                <input type="text" class="form-control" placeholder="Token Code" name="token">
+            </div>
+            <button type="submit" class="btn btn-primary">Verify Token</button>
+        </form>
+    </div>
+    <div class="container border border-success rounderd p-3 m-3">
+        <form action="/verification" method="POST">
+            <p>If your Token has expired, click here to resend to <%=user.email%></p>
+            <input name="email" type="email" value="<%=user.email%>" hidden>
+            <button type="submit" class="btn btn-primary">New Token</button>
+        </form>
+    </div>
+    <div class="container border border-success rounderd p-3 m-3">
+        <form action="/verification" method="POST">
+            <p>If the email <%=user.email%> is wrong, please specify a new email address</p>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Email</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="New email address" name="email">
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
 </div>
 
 <%- include("./partials/footer") -%>

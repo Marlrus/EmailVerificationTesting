@@ -1,20 +1,8 @@
 const   passport        = require('passport'),
-        LocalStrategy   = require('passport-local'),
         User            = require('../models/user')
 
-// //Serialize into cookie
-// passport.serializeUser((user,done)=>{
-//     done(null,user._id)
-// })
-
-// //Deserialize Find User Based on Cookie
-// passport.deserializeUser(async(_id,done)=>{
-//     const foundUser = await User.findById(_id)
-//     done(null,foundUser)
-// })
-
-//Static Auth Method
-// passport.use(new LocalStrategy(User.authenticate()))
+//PASSPORT-LOCAL REQUIRE (NOT BEING USED)
+require('passport-local')
 
 //Local Config
 passport.use(User.createStrategy())

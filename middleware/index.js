@@ -8,9 +8,11 @@ const   middlewareObj   = {},
 require('dotenv').config()
 
 middlewareObj.isLoggedIn = (req,res,next)=>{
-    console.log('==================')
-    console.log('IN THE ISLOGGEDIN MIDDLEWARE')
-    console.log('==================')
+    console.log(`
+    ==============================
+    USING THE isLoggedIn() IMPORTED METHOD
+    ==============================
+    `)
     if(req.isAuthenticated()){
         // console.log(req.user)
         if(!req.user.isVerified){
@@ -27,39 +29,50 @@ middlewareObj.isLoggedIn = (req,res,next)=>{
 
 //TOKEN RELATED
 middlewareObj.createToken = async(user)=>{
-    console.log('==================')
-    console.log('IN THE TOKEN CREATE METHOD')
-    console.log('==================') 
+    console.log(`
+    ==============================
+    USING THE createToken() IMPORTED METHOD
+    ==============================
+    `) 
     let token = await Token.create({
         _userID: user._id,
         token: crypto.randomBytes(16).toString('hex')
     })
     console.log('CREATED TOKEN:')
     console.log(token)
-    console.log('==================')
-    console.log('LEAVING TOKEN CREATE METHOD')
-    console.log('==================')     
     return token
 }
 
 //===============================
 //NODEMAILER SENDGRID RELATED
 //================================
+//COULD DO A CREATE TRANSPORTER METHOD AS WELL
+middlewareObj.createTransporter = ()=>{
+    console.log(`
+    ==============================
+    USING THE createTransporter() METHOD
+    ==============================
+    `)
+    const transporter = nodemailer.createTransport({
+        service: 'Sendgrid',
+        auth: {
+            user: process.env.SENDGRID_USERNAME,
+            pass: process.env.SENDGRID_PASSWORD
+        }
+    })
+    return transporter
+}
 
 //VERIFY EMAIL SEND
 middlewareObj.sendVerificationEmail = async(user,token,req)=>{
-    console.log('==================')
-    console.log('IN THE SENDVERIFICATIONEMAIL METHOD')
-    console.log('==================')
+    console.log(`
+    ==============================
+    USING THE sendVerificationEmail() IMPORTED METHOD
+    ==============================
+    `)
     //USER AND TOKEN GETTING HERE VERIFIED
     try {
-        const transporter = nodemailer.createTransport({
-            service: 'Sendgrid',
-            auth: {
-                user: process.env.SENDGRID_USERNAME,
-                pass: process.env.SENDGRID_PASSWORD
-            }
-        })
+        const transporter = middlewareObj.createTransporter()
         console.log('Creating Mail Options')
         let mailOptions = { 
             from: 'no-reply@emailVerificationTest.com', 
@@ -83,18 +96,14 @@ middlewareObj.sendVerificationEmail = async(user,token,req)=>{
 
 //SEND PASSWORD TOKEN
 middlewareObj.sendPasswordToken = async(user,token,req)=>{
-    console.log('==================')
-    console.log('IN THE SENDPASSWORDTOKEN METHOD')
-    console.log('==================')
+    console.log(`
+    ==============================
+    USING THE sendPasswordToken() IMPORTED METHOD
+    ==============================
+    `)
     //USER AND TOKEN GETTING HERE VERIFIED
     try {
-        const transporter = nodemailer.createTransport({
-            service: 'Sendgrid',
-            auth: {
-                user: process.env.SENDGRID_USERNAME,
-                pass: process.env.SENDGRID_PASSWORD
-            }
-        })
+        const transporter = middlewareObj.createTransporter()
         console.log('Creating Mail Options')
         let mailOptions = { 
             from: 'no-reply@emailVerificationTest.com', 
@@ -118,9 +127,11 @@ middlewareObj.sendPasswordToken = async(user,token,req)=>{
 
 //Update User related
 middlewareObj.updateUser = async (user,req,res)=>{
-    console.log('==================')
-    console.log('IN THE UPDATEUSER METHOD')
-    console.log('==================')
+    console.log(`
+    ==============================
+    USING THE updateUser() IMPORTED METHOD
+    ==============================
+    `)
     //Check if the email is taken
     const checkEmail = await User.findOne({email:req.body.email})
     if(checkEmail){
